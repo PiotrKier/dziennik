@@ -15,7 +15,7 @@
     <header>
       <div class="logo">
         <img src="logo.png" alt="Logo">
-        <h1>Nazwa strony</h1>
+        <h1>Dziennik</h1>
       </div>
     </header>
     <main>
