@@ -44,10 +44,10 @@
   }
 button{
   height: 40px;
-  width: 200px;
+  width: 150px;
   margin-bottom: 20px;
   background-color: #1b5e20;
-  border-radius: 10px;
+  border-radius: 30px;
   border: 0;
   
 }
@@ -55,6 +55,7 @@ button{
   text-decoration: none;
   color: white;
   font-size: 20px;
+
 }
 .form{
   box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
@@ -89,6 +90,7 @@ input.password{
   box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
   font-family: Poppins;
   transition: background-color 0.3s;
+  margin-bottom: 0px;
 }
 
 .submit:hover{
@@ -108,6 +110,15 @@ td{
 p{
   text-align: center;
 
+}
+.back{
+   text-decoration: none;
+   font-size: 20px;
+   color:rgb(0, 115, 255);
+   transition: color 0.5s;
+}
+.back:hover{
+  color:rgb(0, 62, 137);
 }
 
 

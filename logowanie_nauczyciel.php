@@ -26,24 +26,31 @@
 
     if (isset($_POST['submit'])) {
         $password = $_POST['password']; 
-        $zapytanie = "SELECT imie, nazwisko FROM uzytkownik WHERE haslo = '$password'";
+        
+        $zapytanie = "SELECT imie, nazwisko, edycja FROM uzytkownik WHERE haslo = '$password'";
         $wynik = mysqli_query($conn, $zapytanie);
-
-        if ($wynik) {
-            $row = mysqli_fetch_assoc($wynik); 
-
-            if ($row) {
-                echo "Zalogowano jako : <br><b>".htmlspecialchars($row['imie']) ."".htmlspecialchars($row['nazwisko'])."";
-                echo '<script>
-                setTimeout(() => {
-                    window.location.href = "dziennik_nauczyciel.php";
-                }, 1200); 
-              </script>';
-            } 
-            else {
-                echo "Niepoprawne hasło";
-            }
+        if($password=""){
+            echo"wpisz dane";
         }
+        else{
+        if ($wynik && mysqli_num_rows($wynik) > 0) {
+            $row = mysqli_fetch_assoc($wynik);
+            if ($row['edycja'] != 1) {
+                echo "brak dostępu<br><a href='index.php' class=back>Powrót do strony głównej</a>";
+            } else {
+                echo "Zalogowano jako : <br><b>" . htmlspecialchars($row['imie']) . " " . htmlspecialchars($row['nazwisko']) . "";
+                echo '<script>
+                        setTimeout(() => {
+                            window.location.href = "dziennik_uczen.php";
+                        }, 1200); 
+                      </script>';
+            }
+        } else {
+            echo "Niepoprawne hasło";
+        }
+    }
+    }else{
+    echo"<a href='index.php' class=back>Powrót do strony głównej</a>";
     }
     ?>
     </form>
