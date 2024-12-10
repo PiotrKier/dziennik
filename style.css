@@ -111,15 +111,6 @@ p{
   text-align: center;
 
 }
-.back{
-   text-decoration: none;
-   font-size: 20px;
-   color:rgb(0, 115, 255);
-   transition: color 0.5s;
-}
-.back:hover{
-  color:rgb(0, 62, 137);
-}
 
 
 
