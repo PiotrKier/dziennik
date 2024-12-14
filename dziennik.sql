@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 12, 2024 at 08:21 PM
+-- Generation Time: Dec 14, 2024 at 08:11 PM
 -- Wersja serwera: 10.4.32-MariaDB
 -- Wersja PHP: 8.2.12
 
@@ -122,15 +122,9 @@ CREATE TABLE `tabela_glowna` (
   `id` int(30) NOT NULL,
   `uzytkownik_id` int(30) NOT NULL,
   `ocena_id` int(30) NOT NULL,
+  `opis` varchar(255) DEFAULT NULL,
   `przedmiot_id` int(30) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `tabela_glowna`
---
-
-INSERT INTO `tabela_glowna` (`id`, `uzytkownik_id`, `ocena_id`, `przedmiot_id`) VALUES
-(1, 15, 10, 1);
 
 -- --------------------------------------------------------
 
@@ -254,7 +248,7 @@ ALTER TABLE `przedmiot`
 -- AUTO_INCREMENT for table `tabela_glowna`
 --
 ALTER TABLE `tabela_glowna`
-  MODIFY `id` int(30) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(30) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `uzytkownik`
