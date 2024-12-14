@@ -1,11 +1,4 @@
 <?php
-// Sprawdzanie parametru "class"
-if (isset($_GET['class']) && is_numeric($_GET['class'])) {
-    $classId = $_GET['class'];
-} else {
-    die("Brak lub nieprawidłowy identyfikator klasy w adresie URL.");
-}
-
 // Połączenie z bazą danych
 $host = 'localhost';
 $dbname = 'dziennik';
@@ -16,142 +9,244 @@ try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $user, $password);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
-    die("Błąd połączenia z bazą danych: " . $e->getMessage());
+    die("Błąd połączenia: " . $e->getMessage());
 }
 
-// Obsługa dodawania oceny
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $studentId = $_POST['student_id'];
-    $subjectId = $_POST['subject_id'];
-    $gradeId = $_POST['grade_id'];
+$message = "";
 
-    if ($studentId && $subjectId && $gradeId) {
-        $addGradeQuery = $pdo->prepare("
-            INSERT INTO tabela_glowna (uzytkownik_id, ocena_id, przedmiot_id) 
-            VALUES (:studentId, :gradeId, :subjectId)
-        ");
-        $addGradeQuery->execute([
-            ':studentId' => $studentId,
-            ':gradeId' => $gradeId,
-            ':subjectId' => $subjectId
-        ]);
-        $message = "Ocena została dodana.";
-    } else {
-        $message = "Wszystkie pola są wymagane.";
-    }
+// Pobranie klasy z GET
+$idKlasy = $_GET['class'] ?? null;
+
+if (!$idKlasy) {
+    die("Nie wybrano klasy. Wróć do strony wyboru klasy.");
 }
 
-// Pobieranie uczniów z klasy
-$studentsQuery = $pdo->prepare("
-    SELECT uzytkownik_id, imie, nazwisko 
-    FROM uzytkownik 
-    WHERE edycja = 0 AND id_klasy = :classId
-");
-$studentsQuery->bindParam(':classId', $classId, PDO::PARAM_INT);
-$studentsQuery->execute();
-$students = $studentsQuery->fetchAll(PDO::FETCH_ASSOC);
+// Pobranie listy przedmiotów
+$przedmiotyQuery = $pdo->query("SELECT * FROM przedmiot");
+$przedmioty = $przedmiotyQuery->fetchAll(PDO::FETCH_ASSOC);
 
-// Pobieranie przedmiotów
-$subjectsQuery = $pdo->query("SELECT przedmiot_id, przedmiot FROM przedmiot");
-$subjects = $subjectsQuery->fetchAll(PDO::FETCH_ASSOC);
+// Pobranie ocen z tabeli "ocena"
+$ocenyQuery = $pdo->query("SELECT * FROM ocena");
+$listaOcen = $ocenyQuery->fetchAll(PDO::FETCH_ASSOC);
 
-// Pobieranie ocen
-$gradesQuery = $pdo->query("SELECT ocena_id, ocena FROM ocena");
-$grades = $gradesQuery->fetchAll(PDO::FETCH_ASSOC);
+// Pobranie id_przedmiotu z GET
+$idPrzedmiotu = $_GET['przedmiot_id'] ?? null;
+
+// Dodanie oceny
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['uzytkownik_id'], $_POST['ocena_id'], $_POST['opis'])) {
+    $uzytkownikId = $_POST['uzytkownik_id'];
+    $ocenaId = $_POST['ocena_id'];
+    $opis = $_POST['opis'];
+
+    $stmt = $pdo->prepare("INSERT INTO tabela_glowna (uzytkownik_id, ocena_id, opis, przedmiot_id) VALUES (:uzytkownik_id, :ocena_id, :opis, :przedmiot_id)");
+    $stmt->execute([
+        ':uzytkownik_id' => $uzytkownikId,
+        ':ocena_id' => $ocenaId,
+        ':opis' => $opis,
+        ':przedmiot_id' => $idPrzedmiotu
+    ]);
+    $message = "Ocena została dodana.";
+}
+
+// Usuwanie oceny
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_id'])) {
+    $idOceny = $_POST['delete_id'];
+    $stmt = $pdo->prepare("DELETE FROM tabela_glowna WHERE id = :id");
+    $stmt->execute([':id' => $idOceny]);
+    $message = "Ocena została usunięta.";
+}
+
+// Edycja oceny
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_id'], $_POST['ocena_id'], $_POST['opis'])) {
+    $editId = $_POST['edit_id'];
+    $ocenaId = $_POST['ocena_id'];
+    $opis = $_POST['opis'];
+
+    $stmt = $pdo->prepare("UPDATE tabela_glowna SET ocena_id = :ocena_id, opis = :opis WHERE id = :id");
+    $stmt->execute([
+        ':ocena_id' => $ocenaId,
+        ':opis' => $opis,
+        ':id' => $editId
+    ]);
+    $message = "Ocena została zaktualizowana.";
+}
+
+// Pobranie uczniów z wybranej klasy oraz ich ocen dla wybranego przedmiotu
+$oceny = [];
+$uczniowie = [];
+if ($idPrzedmiotu) {
+    $stmt = $pdo->prepare("
+        SELECT tg.id, tg.ocena_id, tg.opis, u.imie, u.drugie_imie, u.nazwisko, tg.uzytkownik_id
+        FROM tabela_glowna tg
+        JOIN uzytkownik u ON tg.uzytkownik_id = u.uzytkownik_id
+        WHERE tg.przedmiot_id = :przedmiot_id AND u.id_klasy = :id_klasy
+    ");
+    $stmt->execute([':przedmiot_id' => $idPrzedmiotu, ':id_klasy' => $idKlasy]);
+    $oceny = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $uczniowieQuery = $pdo->prepare("SELECT * FROM uzytkownik WHERE id_klasy = :id_klasy");
+    $uczniowieQuery->execute([':id_klasy' => $idKlasy]);
+    $uczniowie = $uczniowieQuery->fetchAll(PDO::FETCH_ASSOC);
+}
 ?>
+
 <!DOCTYPE html>
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edycja Ocen - Klasa <?php echo htmlspecialchars($classId); ?></title>
+    <title>Oceny uczniów</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
+            background-color: #f1f1f1;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
             text-align: center;
-            background-color: #f9f9f9;
+            color: #28a745; /* Zielony kolor nagłówka */
             padding: 20px;
-        }
-        .message {
-            color: green;
+            background-color: #fff;
             margin-bottom: 20px;
+            border-bottom: 3px solid #28a745;
         }
+
         table {
-            margin: 20px auto;
+            width: 100%;
+            margin: 20px 0;
             border-collapse: collapse;
-            width: 80%;
-            max-width: 600px;
         }
+
         th, td {
-            border: 1px solid #ccc;
+            border: 1px solid #28a745; /* Zielona obramówka */
             padding: 10px;
             text-align: center;
         }
+
         th {
-            background-color: #007BFF;
+            background-color: #28a745;
             color: white;
         }
-        form {
-            margin-top: 20px;
+
+        td {
+            background-color: #fff;
         }
-        select, input, button {
-            padding: 10px;
-            margin: 5px 0;
-            width: 100%;
-            max-width: 300px;
-            font-size: 14px;
-        }
+
         button {
-            background-color: #007BFF;
+            background-color: #28a745; /* Zielony przycisk */
             color: white;
             border: none;
+            padding: 5px 10px;
             cursor: pointer;
             border-radius: 5px;
+            transition: background-color 0.3s;
         }
+
         button:hover {
-            background-color: #0056b3;
+            background-color: #218838; /* Ciemniejszy zielony po najechaniu */
+        }
+
+        select, input[type="text"] {
+            padding: 8px;
+            font-size: 16px;
+            border: 1px solid #28a745; /* Zielona obramówka */
+            border-radius: 5px;
+            margin: 5px 0;
+        }
+
+        form {
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .message {
+            color: #28a745; /* Zielona wiadomość */
+            text-align: center;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
-    <h1>Edycja Ocen - Klasa <?php echo htmlspecialchars($classId); ?></h1>
+    <h1>Oceny uczniów z klasy <?php echo htmlspecialchars($idKlasy); ?></h1>
 
-    <?php if (isset($message)): ?>
-        <p class="message"><?php echo htmlspecialchars($message); ?></p>
+    <?php if ($message): ?>
+        <p><?php echo htmlspecialchars($message); ?></p>
     <?php endif; ?>
 
-    <?php if (empty($students)): ?>
-        <p>Brak uczniów w wybranej klasie.</p>
-    <?php else: ?>
-        <table>
+    <!-- Wybór przedmiotu -->
+    <form method="GET">
+        <input type="hidden" name="class" value="<?php echo htmlspecialchars($idKlasy); ?>">
+        <select name="przedmiot_id" required>
+            <option value="" disabled selected>Wybierz przedmiot</option>
+            <?php foreach ($przedmioty as $przedmiot): ?>
+                <option value="<?php echo $przedmiot['przedmiot_id']; ?>" <?php echo ($idPrzedmiotu == $przedmiot['przedmiot_id']) ? 'selected' : ''; ?>>
+                    <?php echo htmlspecialchars($przedmiot['przedmiot']); ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+        <button type="submit">Pokaż</button>
+    </form>
+
+    <?php if ($idPrzedmiotu): ?>
+        <table border="1" cellpadding="5" cellspacing="0">
             <tr>
-                <th>Imię</th>
-                <th>Nazwisko</th>
-                <th>Dodaj ocenę</th>
+                <th>Imię i Nazwisko</th>
+                <th>Oceny</th>
+                <th>Dodaj/Edytuj ocenę</th>
             </tr>
-            <?php foreach ($students as $student): ?>
+            <?php foreach ($uczniowie as $uczen): ?>
                 <tr>
-                    <td><?php echo htmlspecialchars($student['imie']); ?></td>
-                    <td><?php echo htmlspecialchars($student['nazwisko']); ?></td>
+                    <td>
+                        <?php 
+                            echo htmlspecialchars($uczen['imie'] . ' ' . ($uczen['drugie_imie'] ? $uczen['drugie_imie'] . ' ' : '') . $uczen['nazwisko']); 
+                        ?>
+                    </td>
+                    <td>
+                        <?php 
+                            foreach ($oceny as $ocena) {
+                                if ($ocena['uzytkownik_id'] == $uczen['uzytkownik_id']) {
+                                    // Pobieramy nazwę oceny z tabeli "ocena"
+                                    $ocenaName = "";
+                                    foreach ($listaOcen as $listaOcena) {
+                                        if ($listaOcena['ocena_id'] == $ocena['ocena_id']) {
+                                            $ocenaName = $listaOcena['ocena'];
+                                            break;
+                                        }
+                                    }
+                                    echo "Ocena: " . htmlspecialchars($ocenaName) . " - Opis: " . htmlspecialchars($ocena['opis']);
+                                    echo " <form method='POST' style='display:inline;'>
+                                            <input type='hidden' name='delete_id' value='{$ocena['id']}'>
+                                            <button type='submit'>Usuń</button>
+                                        </form><br>";
+                                    // Formularz edycji oceny
+                                    echo "<form method='POST'>
+                                            <input type='hidden' name='edit_id' value='{$ocena['id']}'>
+                                            <select name='ocena_id' required>";
+                                    foreach ($listaOcen as $listaOcena) {
+                                        $selected = ($listaOcena['ocena_id'] == $ocena['ocena_id']) ? 'selected' : '';
+                                        echo "<option value='{$listaOcena['ocena_id']}' $selected>{$listaOcena['ocena']}</option>";
+                                    }
+                                    echo "</select>
+                                            <input type='text' name='opis' value='" . htmlspecialchars($ocena['opis']) . "' placeholder='Opis oceny'>
+                                            <button type='submit'>Edytuj</button>
+                                        </form>";
+                                }
+                            }
+                        ?>
+                    </td>
                     <td>
                         <form method="POST">
-                            <input type="hidden" name="student_id" value="<?php echo htmlspecialchars($student['uzytkownik_id']); ?>">
-                            <select name="subject_id" required>
-                                <option value="" disabled selected>Przedmiot</option>
-                                <?php foreach ($subjects as $subject): ?>
-                                    <option value="<?php echo htmlspecialchars($subject['przedmiot_id']); ?>">
-                                        <?php echo htmlspecialchars($subject['przedmiot']); ?>
+                            <input type="hidden" name="uzytkownik_id" value="<?php echo $uczen['uzytkownik_id']; ?>">
+                            <select name="ocena_id" required>
+                                <option value="" disabled selected>Wybierz ocenę</option>
+                                <?php foreach ($listaOcen as $ocena): ?>
+                                    <option value="<?php echo $ocena['ocena_id']; ?>">
+                                        <?php echo htmlspecialchars($ocena['ocena']); ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
-                            <select name="grade_id" required>
-                                <option value="" disabled selected>Ocena</option>
-                                <?php foreach ($grades as $grade): ?>
-                                    <option value="<?php echo htmlspecialchars($grade['ocena_id']); ?>">
-                                        <?php echo htmlspecialchars($grade['ocena']); ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
+                            <input type="text" name="opis" placeholder="Opis oceny">
                             <button type="submit">Dodaj</button>
                         </form>
                     </td>
