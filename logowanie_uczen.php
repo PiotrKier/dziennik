@@ -22,41 +22,48 @@
         <br>
         <input type="submit" value="zaloguj" name="submit" class="submit"><br>
         <?php
-    $conn = mysqli_connect("localhost", "root", "", "dziennik");
-    
-    if (!$conn) {
-        echo "Brak połączenia z bazą danych.";
-    }
+$conn = mysqli_connect("localhost", "root", "", "dziennik");
 
-    if (isset($_POST['submit'])) {
-        $password = $_POST['password']; 
-        $imie = $_POST['imie'];
-        $nazwisko = $_POST['nazwisko'];
-        $edycja=1;
-        $zapytanie = "SELECT imie, nazwisko, edycja FROM uzytkownik WHERE haslo = '$password' AND imie = '$imie' AND nazwisko = '$nazwisko'";
+if (!$conn) {
+    echo "Brak połączenia z bazą danych.";
+}
 
-        $wynik = mysqli_query($conn, $zapytanie);
+if (isset($_POST['submit'])) {
+    $password = $_POST['password']; 
+    $imie = $_POST['imie'];
+    $nazwisko = $_POST['nazwisko'];
 
-        if ($wynik) {
-            $row = mysqli_fetch_assoc($wynik); 
-            if ($row) { 
-                if ($row['edycja'] == 1) {
-                    echo "Niepoprawne dane logowania";
-                } else {
-                    echo "Zalogowano jako : <br><b>" . htmlspecialchars($row['imie']) . " " . htmlspecialchars($row['nazwisko']) . "<br>";
-                    echo '<script>
-                    setTimeout(() => {
-                        window.location.href = "dziennik_nauczyciel.php";
-                    }, 1200); 
-                  </script>';
-                }
-            } else {
+    // Dodajemy uzytkownik_id do zapytania SQL
+    $zapytanie = "SELECT uzytkownik_id, imie, nazwisko, edycja 
+                  FROM uzytkownik 
+                  WHERE haslo = '$password' AND imie = '$imie' AND nazwisko = '$nazwisko'";
+
+    $wynik = mysqli_query($conn, $zapytanie);
+
+    if ($wynik) {
+        $row = mysqli_fetch_assoc($wynik);
+        if ($row) {
+            if ($row['edycja'] == 1) {
                 echo "Niepoprawne dane logowania";
+            } else {
+                // Przekazanie uzytkownik_id do adresu URL
+                $uzytkownik_id = $row['uzytkownik_id'];
+                echo "Zalogowano jako : <br><b>" . htmlspecialchars($row['imie']) . " " . htmlspecialchars($row['nazwisko']) . "</b><br>";
+                echo '<script>
+                    setTimeout(() => {
+                        window.location.href = "przedmioty_oceny.php?uzytkownik_id=' . $uzytkownik_id . '";
+                    }, 1200); 
+                </script>';
             }
+        } else {
+            echo "Niepoprawne dane logowania";
         }
-        
+    } else {
+        echo "Błąd zapytania: " . mysqli_error($conn);
     }
-    ?>
+}
+?>
+
         <a href='index.php' class=back>Powrót do strony głównej</a>
         
     </form>

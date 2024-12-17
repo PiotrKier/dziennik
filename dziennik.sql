@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 14, 2024 at 08:11 PM
+-- Generation Time: Dec 17, 2024 at 05:00 PM
 -- Wersja serwera: 10.4.32-MariaDB
 -- Wersja PHP: 8.2.12
 
@@ -78,8 +78,7 @@ INSERT INTO `ocena` (`ocena_id`, `ocena`) VALUES
 (13, '5'),
 (14, '5+'),
 (15, '6-'),
-(16, '6'),
-(17, '6');
+(16, '6');
 
 -- --------------------------------------------------------
 
@@ -248,7 +247,7 @@ ALTER TABLE `przedmiot`
 -- AUTO_INCREMENT for table `tabela_glowna`
 --
 ALTER TABLE `tabela_glowna`
-  MODIFY `id` int(30) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id` int(30) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `uzytkownik`

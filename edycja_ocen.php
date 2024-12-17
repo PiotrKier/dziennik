@@ -21,6 +21,16 @@ if (!$idKlasy) {
     die("Nie wybrano klasy. Wróć do strony wyboru klasy.");
 }
 
+// Pobranie pełnej nazwy klasy z bazy danych
+$stmt = $pdo->prepare("SELECT klasa FROM klasy WHERE id_klasy = :id_klasy");
+$stmt->execute([':id_klasy' => $idKlasy]);
+$nazwaKlasy = $stmt->fetchColumn();
+
+if (!$nazwaKlasy) {
+    die("Nie znaleziono klasy.");
+}
+
+
 // Pobranie listy przedmiotów
 $przedmiotyQuery = $pdo->query("SELECT * FROM przedmiot");
 $przedmioty = $przedmiotyQuery->fetchAll(PDO::FETCH_ASSOC);
@@ -139,7 +149,7 @@ if ($idPrzedmiotu) {
 </head>
 <body>
     <div class="form">
-    <h1>Oceny uczniów z klasy <?php echo htmlspecialchars($idKlasy); ?></h1>
+    <h1>Oceny uczniów z klasy <?php echo htmlspecialchars($nazwaKlasy); ?></h1>
 
 <?php if ($message): ?>
     <p><?php echo htmlspecialchars($message); ?></p>
