@@ -44,7 +44,8 @@
                 <option value="8">3B</option>
                 <option value="9">3C</option>
             </select><br>
-            <button type="submit">Przejdź do edycji</button>
+            <button type="submit">Przejdź do edycji</button><br>
+            <a href='index.php' class=back>Powrót do strony głównej</a>
         </form>
     </div>
 </body>

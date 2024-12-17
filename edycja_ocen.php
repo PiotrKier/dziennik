@@ -106,7 +106,8 @@ if ($idPrzedmiotu) {
         button{
             margin:20px;
             color:white;
-            font-size:15px;
+            font-size:18px;
+            font-family:Poppins;
         }
         select{
             border-radius:10px;
@@ -118,7 +119,21 @@ if ($idPrzedmiotu) {
             font-size:15px;
             color:#2e7d32;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            font-family:Poppins;
 
+        }
+        input{
+            border: 0;
+            border-radius: 10px;
+            height: 30px;
+            box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+            margin-bottom: 20px;
+            font-family: Poppins;
+            text-align: center;
+        }
+        .form{
+
+            height:300px
         }
     </style>
 </head>
@@ -141,7 +156,8 @@ if ($idPrzedmiotu) {
             </option>
         <?php endforeach; ?>
     </select><br>
-    <button type="submit">Pokaż</button>
+    <button type="submit">Pokaż</button><br>
+    <a href='index.php' class=back>Powrót do strony głównej<br><br><br></a>
 </form>
     </div>
 

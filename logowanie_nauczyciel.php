@@ -20,7 +20,7 @@
         <br>
         <input name="password" class="password" placeholder="password">
         <br>
-        <input type="submit" value="zaloguj" name="submit" class="submit"><br><br>
+        <input type="submit" value="zaloguj" name="submit" class="submit"><br>
         <?php
     $conn = mysqli_connect("localhost", "root", "", "dziennik");
     
@@ -39,23 +39,26 @@
 
         if ($wynik) {
             $row = mysqli_fetch_assoc($wynik); 
-            if($row['edycja']==0){
-                echo"Niepoprawne dane logowania";
+            if ($row) { 
+                if ($row['edycja'] == 0) {
+                    echo "Niepoprawne dane logowania";
+                } else {
+                    echo "Zalogowano jako : <br><b>" . htmlspecialchars($row['imie']) . " " . htmlspecialchars($row['nazwisko']) . "<br>";
+                    echo '<script>
+                    setTimeout(() => {
+                        window.location.href = "dziennik_nauczyciel.php";
+                    }, 1200); 
+                  </script>';
+                }
+            } else {
+                echo "Niepoprawne dane logowania";
             }
-            else{
-            if ($row) {
-                echo "Zalogowano jako : <br><b>".htmlspecialchars($row['imie']) ." ".htmlspecialchars($row['nazwisko'])."";
-                echo '<script>
-                setTimeout(() => {
-                    window.location.href = "dziennik_nauczyciel.php";
-                }, 1200); 
-              </script>';
-            } 
-            
         }
-        }
+        
     }
     ?>
+        <a href='index.php' class=back>Powrót do strony głównej</a>
+        
     </form>
     </div>
     

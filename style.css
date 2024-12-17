@@ -1,4 +1,4 @@
-/* Resetowanie stylów */
+
 * {
     margin: 0;
     padding: 0;
@@ -45,7 +45,7 @@
 button{
   height: 40px;
   width: 150px;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
   background-color: #1b5e20;
   border-radius: 30px;
   border: 0;
@@ -59,7 +59,7 @@ button{
 }
 .form{
   box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
-  height:300px;
+  height:420px;
   width: 300px;
   text-align: center;
   border-radius: 10px;
@@ -90,7 +90,7 @@ input.password{
   box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
   font-family: Poppins;
   transition: background-color 0.3s;
-  margin-bottom: 0px;
+  margin-bottom: 10px;
 }
 
 .submit:hover{
@@ -102,15 +102,34 @@ table{
   padding: 10px;
 }
 td{
-  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+  
   padding: 10px;
   border-radius: 7px;
+  border: 0;
  
 }
 p{
   text-align: center;
-
 }
+th{
+  border: 0;
+}
+
+.back{
+  text-decoration: none;
+   font-weight: 500;
+   font-size: 20px;
+
+   color: rgb(0, 89, 255);
+}
+table{
+border: 0;
+margin-left: 100px;
+}
+
+
+
+
 
 
 
