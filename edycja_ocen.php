@@ -95,98 +95,55 @@ if ($idPrzedmiotu) {
 <head>
     <meta charset="UTF-8">
     <title>Oceny uczniów</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
     <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f1f1f1;
-            margin: 0;
-            padding: 0;
+        h1{
+            font-size:30px;
         }
-
-        h1 {
-            text-align: center;
-            color: #28a745; /* Zielony kolor nagłówka */
-            padding: 20px;
-            background-color: #fff;
-            margin-bottom: 20px;
-            border-bottom: 3px solid #28a745;
+        button{
+            margin:20px;
+            color:white;
+            font-size:15px;
         }
+        select{
+            border-radius:10px;
+            height:30px;
+            width:140px;
+            border:0px;
+            background-color:none;
+            font-weight:500;
+            font-size:15px;
+            color:#2e7d32;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 
-        table {
-            width: 100%;
-            margin: 20px 0;
-            border-collapse: collapse;
-        }
-
-        th, td {
-            border: 1px solid #28a745; /* Zielona obramówka */
-            padding: 10px;
-            text-align: center;
-        }
-
-        th {
-            background-color: #28a745;
-            color: white;
-        }
-
-        td {
-            background-color: #fff;
-        }
-
-        button {
-            background-color: #28a745; /* Zielony przycisk */
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            cursor: pointer;
-            border-radius: 5px;
-            transition: background-color 0.3s;
-        }
-
-        button:hover {
-            background-color: #218838; /* Ciemniejszy zielony po najechaniu */
-        }
-
-        select, input[type="text"] {
-            padding: 8px;
-            font-size: 16px;
-            border: 1px solid #28a745; /* Zielona obramówka */
-            border-radius: 5px;
-            margin: 5px 0;
-        }
-
-        form {
-            margin: 20px 0;
-            text-align: center;
-        }
-
-        .message {
-            color: #28a745; /* Zielona wiadomość */
-            text-align: center;
-            margin-top: 20px;
         }
     </style>
 </head>
 <body>
+    <div class="form">
     <h1>Oceny uczniów z klasy <?php echo htmlspecialchars($idKlasy); ?></h1>
 
-    <?php if ($message): ?>
-        <p><?php echo htmlspecialchars($message); ?></p>
-    <?php endif; ?>
+<?php if ($message): ?>
+    <p><?php echo htmlspecialchars($message); ?></p>
+<?php endif; ?>
 
-    <!-- Wybór przedmiotu -->
-    <form method="GET">
-        <input type="hidden" name="class" value="<?php echo htmlspecialchars($idKlasy); ?>">
-        <select name="przedmiot_id" required>
-            <option value="" disabled selected>Wybierz przedmiot</option>
-            <?php foreach ($przedmioty as $przedmiot): ?>
-                <option value="<?php echo $przedmiot['przedmiot_id']; ?>" <?php echo ($idPrzedmiotu == $przedmiot['przedmiot_id']) ? 'selected' : ''; ?>>
-                    <?php echo htmlspecialchars($przedmiot['przedmiot']); ?>
-                </option>
-            <?php endforeach; ?>
-        </select>
-        <button type="submit">Pokaż</button>
-    </form>
+<!-- Wybór przedmiotu -->
+<form method="GET">
+    <input type="hidden" name="class" value="<?php echo htmlspecialchars($idKlasy); ?>">
+    <select name="przedmiot_id" required>
+        <option value="" disabled selected>Wybierz przedmiot</option>
+        <?php foreach ($przedmioty as $przedmiot): ?>
+            <option value="<?php echo $przedmiot['przedmiot_id']; ?>" <?php echo ($idPrzedmiotu == $przedmiot['przedmiot_id']) ? 'selected' : ''; ?>>
+                <?php echo htmlspecialchars($przedmiot['przedmiot']); ?>
+            </option>
+        <?php endforeach; ?>
+    </select><br>
+    <button type="submit">Pokaż</button>
+</form>
+    </div>
 
     <?php if ($idPrzedmiotu): ?>
         <table border="1" cellpadding="5" cellspacing="0">

@@ -14,6 +14,10 @@
     <form action="" method="post">
         
         <h1>Podaj Hasło</h1>
+        <input name="imie" class="password" placeholder="imie">
+        <br>
+        <input name="nazwisko" class="password" placeholder="nazwisko">
+        <br>
         <input name="password" class="password" placeholder="password">
         <br>
         <input type="submit" value="zaloguj" name="submit" class="submit"><br><br>
@@ -26,14 +30,17 @@
 
     if (isset($_POST['submit'])) {
         $password = $_POST['password']; 
+        $imie = $_POST['imie'];
+        $nazwisko = $_POST['nazwisko'];
         $edycja=1;
-        $zapytanie = "SELECT imie, nazwisko, edycja FROM uzytkownik WHERE haslo = '$password'";
+        $zapytanie = "SELECT imie, nazwisko, edycja FROM uzytkownik WHERE haslo = '$password' AND imie = '$imie' AND nazwisko = '$nazwisko'";
+
         $wynik = mysqli_query($conn, $zapytanie);
 
         if ($wynik) {
             $row = mysqli_fetch_assoc($wynik); 
             if($row['edycja']==0){
-                echo"brak dostępu";
+                echo"Niepoprawne dane logowania";
             }
             else{
             if ($row) {
@@ -44,9 +51,7 @@
                 }, 1200); 
               </script>';
             } 
-            else {
-                echo "Niepoprawne hasło";
-            }
+            
         }
         }
     }
