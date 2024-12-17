@@ -13,7 +13,7 @@
     <div class="form">
     <form action="" method="post">
         
-        <h1>Podaj Hasło</h1>
+        <h1>Podaj dane</h1>
         <input name="imie" class="password" placeholder="imie">
         <br>
         <input name="nazwisko" class="password" placeholder="nazwisko">
